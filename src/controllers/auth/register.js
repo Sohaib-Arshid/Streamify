@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
-const registerUser = asyncHandler(async (req, res) => {
+const register = asyncHandler(async (req, res) => {
     const { fullname, email, password, username } = req.body;
 
     if (!fullname || !email || !password || !username) {
@@ -56,4 +56,4 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
-export { registerUser }
+export {register}
