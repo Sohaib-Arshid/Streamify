@@ -32,7 +32,7 @@ const login = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User does not found!")
     }
 
-    const passwordCheck = await user.isPasswordCorrect(password);
+    const passwordCheck = await user.npasswordcorrect(password);
 
     if (!passwordCheak) {
         throw new ApiError(401, "Password is not correct!")
