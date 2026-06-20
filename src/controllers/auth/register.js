@@ -30,7 +30,12 @@ const register = asyncHandler(async (req, res) => {
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImagePath)
+    if (!avatar) {
+        throw new ApiError(400, "Avatar is required")
+    }
+    const coverImage = coverImagePath
+        ? await uploadOnCloudinary(coverImagePath)
+        : null;
 
     if (!avatar) {
         throw new ApiError(400, "Avatar is required")
@@ -45,7 +50,7 @@ const register = asyncHandler(async (req, res) => {
         coverImage: coverImage?.url || ""
     })
 
-    const createUser = await User.findById(register._id).select("-password -refresToken")
+    const createUser = await User.findById(register._id).select("-password -refreshToken")
 
     if (!createUser) {
         throw new ApiError(500, "Something went wrong while registring the user")
@@ -56,4 +61,4 @@ const register = asyncHandler(async (req, res) => {
     )
 })
 
-export {register}
+export { register }
