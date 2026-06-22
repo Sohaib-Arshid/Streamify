@@ -279,6 +279,74 @@ const updateCoverImage = asyncHandler(async (req, res) => {
         .status(200)
         .json(200, user, "Avatar updated successfully")
 })
+
+const getUserChannalProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+
+    if (!username?.trim()) {
+        throw new ApiError(400, "Username is messing")
+    }
+
+    const channal = User.aggregate([
+        {
+            $match: {
+                username: username?.toLowerCase()
+            }
+        },
+        {
+            $lookup: {
+                from: "Subscription",
+                localFeild: "_id",
+                foreignFeild: "channal",
+                as: "subscriber"
+            }
+        },
+        {
+            $lookup: {
+                from: "Subscription",
+                localFeild: "_id",
+                foreignFeild: "subscriber",
+                as: "subscribeTo"
+            }
+        },
+        {
+            $addFeild: {
+                subscriberCount: {
+                    $size: "subscriber"
+                },
+                channalSubscribeCount: {
+                    $size: subscribeTo
+                },
+                isSubscribed: {
+                    $cond: {
+                        if: {
+                            $in: [req.user?._id, "$subscriber : subscriber"]
+                        },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project : {
+                fullName : 1,
+                username : 1,
+                subscriberCount : 1,
+                channalSubscribeCount: 1,
+                isSubscribed: 1,
+                avtar : 1,
+                coverImage : 1,
+                email : 1,
+                createdAt : 1
+            }
+        }
+    ])
+})
 // ==================== EXPORTS ====================
 
-export { register, login, logout, refreshAccessToken, changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage }
+export {
+    register, login, logout, refreshAccessToken,
+    changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage,
+    getUserChannalProfile
+}

@@ -8,7 +8,8 @@ const UserSchema = mongoose.Schema({
         required: true,
         trim: true,
         index: true,
-        unique: true
+        unique: true,
+        toLowerCase: true
     },
     email: {
         type: String,
@@ -83,6 +84,6 @@ UserSchema.methods.generateRefreshToken = function () {
         }
     )
 }
-const User = mongoose.model("User", UserSchema) 
+const User = mongoose.model("User", UserSchema)
 
-export {User}
+export { User }
