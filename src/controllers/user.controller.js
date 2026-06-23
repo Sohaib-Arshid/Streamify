@@ -418,16 +418,16 @@ const increaseViewCount = asynchandler(async (req, res) => {
         throw new ApiError(400, "video is not available")
     }
 
-    const video = await findById(videoId)
+    const video = await Video.findById(videoId)
 
     if (!video) {
-        throw new ApiError(400, "video does not exist")
+        throw new ApiError(404, "video does not exist")
     }
 
     const user = req.user;
 
     if (!user) {
-        throw new ApiError(400, "user is not available")
+        throw new ApiError(401, "user is not available")
     }
 
     const checkVideo = user.watchHistory.some(id => id.toString() === videoId)
@@ -437,18 +437,17 @@ const increaseViewCount = asynchandler(async (req, res) => {
             .status(200)
             .json(
                 new ApiResponse(
-                    200, null, "video watched successfully"
+                    200, { alreadyWatched: true, views: video.views },"video watched successfully"
                 )
             )
-    } else {
-        const increasedView = await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } }, { new: true })
-        if (increasedView === null) {
-            throw new ApiError(400, "view does not increase")
-        }
-        const watchHistoryadd = await User.findByIdAndUpdate(user._id, { $addToSet: { watchHistory: videoId } }, { new: true })
-        if (watchHistoryadd === null) {
-            throw new ApiError(400, "watchHistory does not increase")
-        }
+    }
+    const increasedView = await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } }, { new: true })
+    if (increasedView === null) {
+        throw new ApiError(400, "view does not increase")
+    }
+    const watchHistoryadd = await User.findByIdAndUpdate(user._id, { $addToSet: { watchHistory: videoId } }, { new: true })
+    if (watchHistoryadd === null) {
+        throw new ApiError(400, "watchHistory does not increase")
     }
 
     return res
