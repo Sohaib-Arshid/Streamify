@@ -362,35 +362,36 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         {
             $match: {
                 _id: new mongoose.Types.ObjectId(req.user._id)
-            },
-
+            }
+        },
+        {
             $lookup: {
-                from: "Video",
-                localField: "watchHistory",
+                from: "videos",           
+                localField: "watchHistory", 
                 foreignField: "_id",
-                as: "watchHistory",
-                pipeline: [
+                as: "watchHistory",   
+                pipeline: [                 
                     {
                         $lookup: {
                             from: "users",
                             localField: "owner",
                             foreignField: "_id",
-                            as : "owner",
-                            pipeline : [
+                            as: "owner",
+                            pipeline: [
                                 {
-                                    $project : {
-                                        fullname : 1,
-                                        username : 1,
-                                        avatar : 1
+                                    $project: {
+                                        fullname: 1,
+                                        username: 1,
+                                        avatar: 1
                                     }
                                 }
                             ]
                         }
                     },
                     {
-                        $addFields : {
-                            $owner : {
-                                $first : $owner
+                        $addFields: {
+                            owner: {
+                                $first: "$owner" 
                             }
                         }
                     }
@@ -400,12 +401,14 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     ])
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(
-        200 , user[0].watchHistory , "watch history fatched successfully"
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                user[0].watchHistory,
+                "Watch history fetched successfully"
+            )
         )
-    )
 })
 // ==================== EXPORTS ====================
 
