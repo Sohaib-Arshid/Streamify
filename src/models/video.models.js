@@ -12,7 +12,8 @@ const videoSchema = mongoose.Schema({
     },
     owner: {    
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required : true
     },
     title: {
         type: String,
@@ -41,6 +42,6 @@ const videoSchema = mongoose.Schema({
     timestamps : true
 })
 
-videoSchema.Plugin(mongooseaggregatePaginate)
+videoSchema.plugin(mongooseaggregatePaginate)
 
 export const Video = mongoose.model("Video", videoSchema)

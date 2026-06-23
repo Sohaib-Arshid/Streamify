@@ -288,7 +288,7 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Username is messing")
     }
 
-    const channal = await User.aggregate([
+    const channel = await User.aggregate([
         {
             $match: {
                 username: username?.toLowerCase()
@@ -298,7 +298,7 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
             $lookup: {
                 from: "Subscriptions",
                 localField: "_id",
-                foreignField: "channal",
+                foreignField: "channel",
                 as: "subscriber"
             }
         },
@@ -345,13 +345,13 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
     ])
 
     if (!channal?.length) {
-        throw new ApiError(400, "channal does not exists")
+        throw new ApiError(400, "channel does not exists")
     }
 
     return res.status(200).json(
         new ApiResponse(
             200,
-            channal[0],
+            channel[0],
             "Channel fetched successfully"
         )
     )
