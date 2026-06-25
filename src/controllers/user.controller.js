@@ -6,6 +6,8 @@ import { Like } from "../models/like.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
+import { Video } from "../models/video.models.js"
+import { Subscription } from "../models/subscription.models.js"
 
 // ==================== TOKEN GENERATION ====================
 
