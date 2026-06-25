@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, logout, refreshAccessToken, changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage, getUserChannalProfile, getWatchHistory, increaseViewCount } from "../controllers/user.controller.js";
+import { register, login, logout, refreshAccessToken, changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage, getUserChannalProfile, getWatchHistory, increaseViewCount, likefeature } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -21,9 +21,10 @@ router.route("/update-account-detailes").patch(verifyJWT, updateAccountDetailes)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
 router.route("/avatar").patch(verifyJWT, upload.single("avatar"),  updateUserAvatar)
 router.route("/cover-image-update").patch(verifyJWT, upload.single("coverImage"),  updateCoverImage)
-router.route("/c/:username").get(verifyJWT,getUserChannalProfile)
+router.route("/channel/:username").get(verifyJWT, getUserChannalProfile)
+router.route("/watch/:videoId").patch(verifyJWT, increaseViewCount)
 router.route("/history").get(verifyJWT,getWatchHistory)
-router.route("/c/:videoId").patch(verifyJWT, increaseViewCount)
+router.route("/like/toggle/v/:videoId").post(verifyJWT, likefeature);
 
 
 export default router

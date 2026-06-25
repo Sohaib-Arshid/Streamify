@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.models.js"
+import { Like } from "../models/like.models.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
@@ -411,7 +412,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         )
 })
 
-const increaseViewCount = asynchandler(async (req, res) => {
+const increaseViewCount = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
     if (!videoId) {
@@ -437,7 +438,7 @@ const increaseViewCount = asynchandler(async (req, res) => {
             .status(200)
             .json(
                 new ApiResponse(
-                    200, { alreadyWatched: true, views: video.views },"video watched successfully"
+                    200, { alreadyWatched: true, views: video.views }, "video watched successfully"
                 )
             )
     }
@@ -458,10 +459,72 @@ const increaseViewCount = asynchandler(async (req, res) => {
             )
         )
 })
+
+const likefeature = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    if (!videoId) {
+        throw new ApiError(400, "video Id is not available")
+    }
+
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+        throw new ApiError(404, "video not found")
+    }
+
+    const user = req.user
+
+    if (!user) {
+        throw new ApiError(401, "unauthorized")
+    }
+
+    const existingLike = await Like.findOne({
+        user: user._id,
+        video: videoId
+    });
+
+    if (!existingLike) {
+        const createLike = await Like.create({
+            user: user._id,
+            video: videoId
+        })
+
+        const likeCount = await Like.countDocuments({video : videoId})
+
+        return res
+            .status(201)
+            .json(
+                new ApiResponse(
+                    201, {like : createLike,  liked: true, likeCount }, "video liked successfully"
+                )
+            )
+    } else {
+        const deleteLike = await Like.deleteOne({
+            user: user._id,
+            video: videoId
+        })
+
+        const likeCount = await Like.countDocuments({video : videoId})
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200, {liked: false, likeCount }, "video unliked successfully"
+                )
+            )
+    }
+
+})
+
+const comment = asyncHandler(async (req , res )=>{
+    
+})
 // ==================== EXPORTS ====================
 
 export {
     register, login, logout, refreshAccessToken,
     changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage,
-    getUserChannalProfile, getWatchHistory, increaseViewCount
+    getUserChannalProfile, getWatchHistory, increaseViewCount , likefeature
 }
