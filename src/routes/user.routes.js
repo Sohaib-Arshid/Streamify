@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { register, login, logout, refreshAccessToken, changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage, getUserChannalProfile, getWatchHistory, increaseViewCount, likefeature } from "../controllers/user.controller.js";
-import { commentsfetch, createComment, updateComment } from "../controllers/comment.controller.js";
+import { commentsfetch, createComment, deleteComment, updateComment } from "../controllers/comment.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -29,6 +29,7 @@ router.route("/like/toggle/v/:videoId").post(verifyJWT, likefeature);
 router.route("/comments/:videoId").post(verifyJWT, createComment);
 router.route("/comments/:videoId").get(verifyJWT, commentsfetch);
 router.route("/comments/:commentId").patch(verifyJWT, updateComment);
+router.route("/comments/:commentId").delete(verifyJWT, deleteComment);
 
 
 export default router
