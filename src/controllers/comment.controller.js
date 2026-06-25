@@ -26,14 +26,14 @@ const createComment = asyncHandler(async (req, res) => {
         throw new ApiError(401, "unauthorized")
     }
 
-    const content = req.body.content
+    const {content} = req.body
     if (!content || content === "") {
         throw new ApiError(400, "contant is not available")
     }
     const commentCreate = await Comment.create({
         owner: user,
         video: videoId,
-        content: content
+        content: content.trim()
     })
 
     const commentCount  = await Comment.countDocuments({

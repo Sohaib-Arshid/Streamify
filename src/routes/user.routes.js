@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { register, login, logout, refreshAccessToken, changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage, getUserChannalProfile, getWatchHistory, increaseViewCount, likefeature } from "../controllers/user.controller.js";
+import { createComment } from "../controllers/comment.controller.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -25,6 +26,7 @@ router.route("/channel/:username").get(verifyJWT, getUserChannalProfile)
 router.route("/watch/:videoId").patch(verifyJWT, increaseViewCount)
 router.route("/history").get(verifyJWT,getWatchHistory)
 router.route("/like/toggle/v/:videoId").post(verifyJWT, likefeature);
+router.route("/comment/:videoId").post(verifyJWT, createComment);
 
 
 export default router
