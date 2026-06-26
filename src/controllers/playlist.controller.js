@@ -185,10 +185,10 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(409, "Video already exist in playlist");
     }
 
-    const updatedPlaylist = await Playlist.updateOne(
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
         playlistId,
         {
-            $push: { videos: videoId }
+            $addToSet: { videos: videoId }
         },
         { new: true }
     )
@@ -204,4 +204,59 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         );
 })
 
-export { createPlaylist, getPlaylist, addVideoToPlaylist }
+const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+    const { videoId, playlistId } = req.params;
+
+    if (!videoId || !playlistId) {
+        throw new ApiError(400, "Video ID and Playlist ID are required");
+    }
+
+    const playlist = await Playlist.findById(playlistId);
+
+    if (!playlist) {
+        throw new ApiError(404, "Playlist not found");
+    }
+
+    const user = req.user;
+
+    if (!user) {
+        throw new ApiError(401, "Unauthorized access");
+    }
+
+    if (playlist.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You can only modify your own playlists");
+    }
+
+    const videoExists = playlist.videos.some(
+        id => id.toString() === videoId
+    );
+
+    if (!videoExists) {
+        throw new ApiError(404, "Video not found in playlist");
+    }
+
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+            $pull: { videos: videoId }  
+        },
+        { new: true }
+    );
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                updatedPlaylist,
+                "Video removed from playlist successfully"
+            )
+        );
+});
+
+export { 
+    createPlaylist, 
+    getPlaylist, 
+    addVideoToPlaylist, 
+    removeVideoFromPlaylist  
+};
