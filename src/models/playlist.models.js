@@ -19,6 +19,7 @@ const playlistSchema = new Schema({
     video: {
         type: Schema.Types.ObjectId,
         ref: "Video",
+        default : []
     },
     isPublic : {
         type : Boolean,
