@@ -151,4 +151,57 @@ const getPlaylist = asyncHandler(async (req, res) => {
         );
 })
 
-export { createPlaylist , getPlaylist }
+
+const addVideoToPlaylist = asyncHandler(async (req, res) => {
+    const { videoId, playlistId } = req.params;
+
+    if (!videoId || !playlistId) {
+        throw new ApiError(400, "Bad request");
+    }
+
+    const playlist = await Playlist.findById(playlistId);
+    if (!playlist) {
+        throw new ApiError(404, "playlist not exist");
+    }
+
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(404, "video not exist");
+    }
+
+    const user = req.user
+
+    if (!user) {
+        throw new ApiError(400, "unauthorized access");
+    }
+
+    if (playlist.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "Forbidden");
+    }
+
+    const existVideo = playlist.videos.includes(videoId);
+
+    if (existVideo) {
+        throw new ApiError(409, "Video already exist in playlist");
+    }
+
+    const updatedPlaylist = await Playlist.updateOne(
+        playlistId,
+        {
+            $push: { videos: videoId }
+        },
+        { new: true }
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                updatedPlaylist,
+                "Video add successfully in playlist"
+            )
+        );
+})
+
+export { createPlaylist, getPlaylist, addVideoToPlaylist }
