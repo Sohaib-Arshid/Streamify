@@ -299,7 +299,7 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: "Subscriptions",
+                from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
                 as: "subscriber"
@@ -307,9 +307,9 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: "Subscriptions",
+                from: "subscriptions",
                 localField: "_id",
-                foreignFeild: "subscriber",
+                foreignField: "subscriber",
                 as: "subscribeTo"
             }
         },
@@ -319,12 +319,21 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
                     $size: "$subscriber"
                 },
                 channalSubscribeCount: {
-                    $size: $subscribeTo
+                    $size: "$subscribeTo"
                 },
                 isSubscribed: {
                     $cond: {
                         if: {
-                            $in: [req.user?._id, "$subscriber : subscriber"]
+                            $in: [
+                                req.user?._id,
+                                {
+                                    $map: {
+                                        input: "$subscriber",
+                                        as: "sub",
+                                        in: "$$sub.subscriber"
+                                    }
+                                }
+                            ]
                         },
                         then: true,
                         else: false
@@ -347,7 +356,7 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
         }
     ])
 
-    if (!channal?.length) {
+    if (!channel?.length) {
         throw new ApiError(400, "channel does not exists")
     }
 
@@ -366,7 +375,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     if (!user) {
         throw new ApiError(401, "Unauthorized access");
     }
-    const user = await User.aggregate([
+    const users = await User.aggregate([
         {
             $match: {
                 _id: new mongoose.Types.ObjectId(req.user._id)
@@ -414,7 +423,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             success: true,
             statusCode: 200,
             message: "Watch history fetched successfully",
-            data: user[0].watchHistory
+            data: users[0].watchHistory
         });
 })
 
