@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import mongooseaggregatePaginate from "mongoose-aggregate-paginate-v2"
 
 const commentSchema = new Schema({
     owner: {
@@ -20,4 +21,5 @@ const commentSchema = new Schema({
     }
 )
 commentSchema.plugin(mongooseaggregatePaginate)
+
 export const Comment = mongoose.model("Comment", commentSchema)
