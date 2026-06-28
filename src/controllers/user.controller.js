@@ -361,6 +361,11 @@ const getUserChannalProfile = asyncHandler(async (req, res) => {
 })
 
 const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = req.user;
+
+    if (!user) {
+        throw new ApiError(401, "Unauthorized access");
+    }
     const user = await User.aggregate([
         {
             $match: {
@@ -405,13 +410,12 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                user[0].watchHistory,
-                "Watch history fetched successfully"
-            )
-        )
+        .json({
+            success: true,
+            statusCode: 200,
+            message: "Watch history fetched successfully",
+            data: user[0].watchHistory
+        });
 })
 
 const increaseViewCount = asyncHandler(async (req, res) => {
@@ -492,13 +496,13 @@ const likefeature = asyncHandler(async (req, res) => {
             video: videoId
         })
 
-        const likeCount = await Like.countDocuments({video : videoId})
+        const likeCount = await Like.countDocuments({ video: videoId })
 
         return res
             .status(201)
             .json(
                 new ApiResponse(
-                    201, {like : createLike,  liked: true, likeCount }, "video liked successfully"
+                    201, { like: createLike, liked: true, likeCount }, "video liked successfully"
                 )
             )
     } else {
@@ -507,26 +511,26 @@ const likefeature = asyncHandler(async (req, res) => {
             video: videoId
         })
 
-        const likeCount = await Like.countDocuments({video : videoId})
+        const likeCount = await Like.countDocuments({ video: videoId })
 
         return res
             .status(200)
             .json(
                 new ApiResponse(
-                    200, {liked: false, likeCount }, "video unliked successfully"
+                    200, { liked: false, likeCount }, "video unliked successfully"
                 )
             )
     }
 
 })
 
-const comment = asyncHandler(async (req , res )=>{
-    
+const comment = asyncHandler(async (req, res) => {
+
 })
 // ==================== EXPORTS ====================
 
 export {
     register, login, logout, refreshAccessToken,
     changePassword, getCurrentUser, updateAccountDetailes, updateCoverImage,
-    getUserChannalProfile, getWatchHistory, increaseViewCount , likefeature , updateUserAvatar
+    getUserChannalProfile, getWatchHistory, increaseViewCount, likefeature, updateUserAvatar
 }
