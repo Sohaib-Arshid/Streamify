@@ -1,8 +1,11 @@
+import mongoose from "mongoose";
+import { Like } from "../models/like.models.js";
 import { Video } from "../models/video.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Comment } from "../models/comment.models.js";
 
 const uploadVideo = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -37,7 +40,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
         title: title,
         description: description,
         thumbnail: thumbnail.url,
-        durattion: video.duration,
+        duration: video.duration,
         isPublished: true
     })
 
@@ -45,9 +48,98 @@ const uploadVideo = asyncHandler(async (req, res) => {
         .status(201)
         .json(
             new ApiResponse(
-                201, { video: createVideo}, "video uploaded successfully"
+                201, { video: createVideo }, "video uploaded successfully"
             )
         )
 })
 
-export { uploadVideo }
+const getVideoById = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    if (!videoId) {
+        throw new ApiError(400, "video is not available")
+    }
+
+    const user = req.user
+
+    if (!user) {
+        throw new ApiError(401, "unauthorized access")
+    }
+
+    const videoWithDetails = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(videoId),
+            }
+        }, {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            fullname: 1,
+                            username: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                owner: {
+                    $first: "$owner"
+                }
+            }
+        }, {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "video",
+                as: "likes"
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "video",
+                as: "comments"
+            }
+        },
+        {
+            $addFields: {
+                likeCount: { $size: "$likes" },
+                commentCount: { $size: "$comments" }
+            }
+        },
+        {
+            $project: {
+                likes: 0,
+                comments: 0,
+            }
+        },
+    ])
+
+    if (videoWithDetails.length === 0) {
+        throw new ApiError(404, "video not found")
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    video: videoWithDetails[0],
+                },
+                "Video fetched successfully"
+            )
+        );
+
+})
+
+export { uploadVideo, getVideoById }
