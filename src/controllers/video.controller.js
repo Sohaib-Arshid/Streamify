@@ -14,6 +14,11 @@ const uploadVideo = asyncHandler(async (req, res) => {
         throw new ApiError(401, "unauthorized access")
     }
 
+    const body = {};
+    for (const key in req.body) {
+        body[key.trim()] = req.body[key];
+    }
+
     const { title, description } = req.body;
 
     if (!title.trim() || !description.trim()) {

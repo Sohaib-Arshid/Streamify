@@ -284,7 +284,9 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(200, user, "Avatar updated successfully")
+        .json(
+            new ApiResponse(200, user, "Avatar updated successfully")
+        )
 })
 
 const getUserChannalProfile = asyncHandler(async (req, res) => {

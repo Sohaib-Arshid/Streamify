@@ -79,6 +79,7 @@ const commentsfetch = asyncHandler(async (req, res) => {
         throw new ApiError(400, "invalid limit")
     }
 
+    const skip = (page - 1) * limit;
     const comments = await Comment.aggregate([
         {
             $match: {
