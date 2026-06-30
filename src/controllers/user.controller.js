@@ -538,9 +538,6 @@ const likefeature = asyncHandler(async (req, res) => {
 
 })
 
-const comment = asyncHandler(async (req, res) => {
-
-})
 // ==================== EXPORTS ====================
 
 export {

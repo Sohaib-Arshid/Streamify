@@ -165,11 +165,11 @@ const updateComment = asyncHandler(async (req, res) => {
     }
 
     const { content } = req.body
-    if (!content || content.trim()) {
+    if (!content || !content.trim()) {
         throw new ApiError(400, "contant is not available")
     }
 
-    if (comment.owner.toString() !== req.user._id.toString()) {
+    if (comment.owner.toString() !== user._id.toString()) {
         throw new ApiError(403, "You can only update your own comments")
     }
 
