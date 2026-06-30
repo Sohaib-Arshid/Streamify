@@ -17,11 +17,13 @@ app.use(cookieParser());
 import userRouter from "./routes/user.routes.js";
 import playlistRouter from "./routes/playlist.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
+import searchRouter from "./routes/search.routes.js"
 
 app.use("/api/v1/users", userRouter); 
 app.use("/api/v1/playlists", playlistRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/videos", videoRouter);
+app.use("/api/v1/search", searchRouter);
 
 app.get("/api/v1/health", (req, res) => {
     res.status(200).json({ status: "OK", message: "Server is running" });
