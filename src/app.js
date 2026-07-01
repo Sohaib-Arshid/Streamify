@@ -19,6 +19,12 @@ import playlistRouter from "./routes/playlist.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import searchRouter from "./routes/search.routes.js"
 
+// app.js - routes ke baad
+app.use((req, res, next) => {
+    console.log(`[${req.method}] ${req.path}`);
+    next();
+});
+
 app.use("/api/v1/users", userRouter); 
 app.use("/api/v1/playlists", playlistRouter);
 app.use("/api/v1/dashboard", dashboardRouter);

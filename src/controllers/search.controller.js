@@ -15,6 +15,14 @@ const searchApi = asyncHandler(async (req, res) => {
     const limitNum = parseInt(limit)
     const skip = (pageNum - 1) * limitNum
 
+    const totalVideos = await Video.countDocuments({
+        isPublished: true,
+        $or: [
+            { title: { $regex: search.trim(), $options: "i" } },
+            { description: { $regex: search.trim(), $options: "i" } }
+        ]
+    });
+
     const searchVideos = await Video.aggregate([
         {
             $match: {
