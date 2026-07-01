@@ -219,7 +219,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You can only modify your own playlists");
     }
 
-    const videoExists = playlist.videos.some(
+    const videoExists = playlist.video.some(
         id => id.toString() === videoId
     );
 
