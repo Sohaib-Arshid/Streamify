@@ -284,6 +284,10 @@ This project helped me practice:
 - Backend Project Structure
 
 ---
+Postman
+
+    "name": "streamify",
+    "_collection_link": "https://go.postman.co/collection/52978744-89c32e09-fc57-4557-b414-7213bf380117?source=collection_link"
 
 # 🚀 Upcoming Improvements
 
