@@ -173,6 +173,10 @@ All routes are prefixed with `/api/v1`.
 👉 For every endpoint's method, auth requirement, request/response shape, and validation rules, see **`API_DOCUMENTATION.docx`**.
 
 ---
+Postman
+
+    "name": "streamify",
+    "_collection_link": "https://go.postman.co/collection/52978744-89c32e09-fc57-4557-b414-7213bf380117?source=collection_link"
 
 ## 🖼️ Project Screenshots
 
